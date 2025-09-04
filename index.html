@@ -278,13 +278,18 @@ function calcular() {
     );
 
     // Calculo com apenas 1 base (periodos 1, 4 e 5)
-    if (
-    (dataSelecionada >= periodo1Inicio && dataSelecionada <= periodo1Fim) || 
-    (dataSelecionada >= periodo4Inicio && dataSelecionada <= periodo4Fim) || 
-    (dataSelecionada >= periodo5Inicio && dataSelecionada <= periodo5Fim)) {
+    if (dataSelecionada >= periodo1Inicio && dataSelecionada <= periodo1Fim) {
         calculo1Base(valorNumerico, periodo1AliqFaixa1);
     } 
+
+    else if (dataSelecionada >= periodo4Inicio && dataSelecionada <= periodo4Fim) {
+        calculo1Base(valorNumerico, periodo4AliqFaixa1);
+    } 
     
+    else if (dataSelecionada >= periodo5Inicio && dataSelecionada <= periodo5Fim) {
+        calculo1Base(valorNumerico, periodo5AliqFaixa1)
+    } 
+
     // Calculo com 2 bases (periodo 3)
     else if (dataSelecionada >= periodo3Inicio && dataSelecionada <= periodo3Fim) {
         calculo2Bases(valorNumerico, periodo3AliqFaixa1, periodo3ContriMaxFaixa1, periodo3AliqFaixa2, periodo3ContriMaxFaixa2);
