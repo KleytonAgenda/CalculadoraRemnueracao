@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Calculadora de Contribuição</title>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background: #f3f4f6;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+    }
+    .container {
+        background: #fff;
+        padding: 20px;
+        border-radius: 10px;
+        width: 100%;
+        max-width: 500px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+    h2 {
+        margin-bottom: 15px;
+        text-align: center;
+        color: #333;
+    }
+    label {
+        display: block;
+        margin: 10px 0 5px;
+        font-weight: bold;
+    }
+    select, input, .output {
+        display: block;
+        width: 100%;
+        padding: 10px;
+        margin-bottom: 10px;
+        border-radius: 6px;
+        border: 1px solid #ccc;
+        font-size: 16px;
+        box-sizing: border-box;
+    }
+    .output {
+        background: #f9f9f9;
+        min-height: 40px;
+        display: flex;
+        align-items: center;
+        color: #444;
+    }
+    .buttons {
+        display: flex;
+        justify-content: space-between;
+        gap: 10px;
+    }
+
+    .campo_mes_e_ano {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 10px;
+    }
+
+    .campo_mes_e_ano .campo {
+        flex: 1; 
+    }
+
+    button {
+        flex: 1;
+        padding: 10px;
+        font-size: 16px;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+    }
+    .btn-primary {
+        background: #4f46e5;
+        color: #fff;
+    }
+    .btn-secondary {
+        background: #e5e7eb;
+        color: #333;
+    }
+    button:hover {
+        opacity: 0.9;
+    }
+
+    #btn-limpar {
+    background-color: #ccc; /* cor padrão */
+    color: #333;
+    cursor: not-allowed;
+    transition: background 0.3s;
+    }
+
+    #btn-limpar.ativo {
+        background-color: #e53935; /* vermelho quando ativo */
+        color: #fff;
+        cursor: pointer;
+    }
+
+
+</style>
+</head>
+<body>
+
+<div class="container">
+    <div class="campo_mes_e_ano">
+    
+        <div class="campo">
+            <label for="ano">Selecione o Ano</label>
+            <select id="ano">
+                <!-- Opções serão geradas via JavaScript -->
+            </select>
+        </div>
+        <div class="campo">
+            <label for="mes">Selecione o Mês</label>
+            <select id="mes">
+                <option value="">Selecione</option>
+                <option value="1">Janeiro</option>
+                <option value="2">Fevereiro</option>
+                <option value="3">Março</option>
+                <option value="4">Abril</option>
+                <option value="5">Maio</option>
+                <option value="6">Junho</option>
+                <option value="7">Julho</option>
+                <option value="8">Agosto</option>
+                <option value="9">Setembro</option>
+                <option value="10">Outubro</option>
+                <option value="11">Novembro</option>
+                <option value="12">Dezembro</option>
+            </select>
+        </div>
+    </div>
+
+    <label for="valor">Valor da Contribuição</label>
+    <input type="text" id="valor" placeholder="R$ 0,00" data-value="0">
+
+    <label>Resultado</label>
+    <div class="output" id="resultado">—</div>
+
+    <div class="buttons">
+        <button class="btn-primary" onclick="calcular()">Calcular</button>
+        <button id="btn-limpar" class="btn-secondary" onclick="limpar()" disabled>Limpar</button>
+    </div>
+</div>
+<script>
+
+const valorContribuicao = document.getElementById('valor');
+const resultado = document.getElementById('resultado');
+const btnLimpar = document.getElementById('btn-limpar');
+const mesDigitado = document.getElementById('mes');
+const anoDigitado = document.getElementById('ano');
+const anoAtual = new Date().getFullYear();
+const intervaloDeAno = document.getElementById('ano');
+
+for (let ano = 1994; ano <= anoAtual; ano++) {
+    const option = document.createElement('option');
+    option.value = ano;
+    option.text = ano;
+    intervaloDeAno.appendChild(option);
+}
+
+// Periodo 1
+// 1 base
+const periodo1Inicio = new Date(1994, 6, 1);
+const periodo1Fim = new Date(1999, 6, 31);
+const periodo1AliqFaixa1 = 0.08
+const periodo1ContriMaxFaixa1 = 9999999
+
+// Periodo 2
+// 3 bases
+const periodo2Inicio = new Date(1999, 7, 1);
+const periodo2Fim = new Date(2004, 9, 31);
+const periodo2AliqFaixa1 = 0.08
+const periodo2ContriMaxFaixa1 = 22.4
+const periodo2AliqFaixa2 = 0.1
+const periodo2ContriMaxFaixa2 = 120
+const periodo2AliqFaixa3 = 0.12
+const periodo2ContriMaxFaixa3 = 9999999
+
+// Periodo 3
+// 2 bases
+const periodo3Inicio = new Date(2004, 10, 1);
+const periodo3Fim = new Date(2017, 2, 31);
+const periodo3AliqFaixa1 = 0.11
+const periodo3ContriMaxFaixa1 = 132
+const periodo3AliqFaixa2 = 0.12
+const periodo3ContriMaxFaixa2 = 9999999
+
+// Periodo 4
+// 1 base
+const periodo4Inicio = new Date(2017, 3, 1);
+const periodo4Fim = new Date(2017, 11, 31);
+const periodo4AliqFaixa1 = 0.13
+const periodo4ContriMaxFaixa1 = 9999999
+
+// Periodo 5
+// 1 base
+const periodo5Inicio = new Date(2018, 0, 1);
+const periodo5Fim = new Date(anoAtual, 11, 31);
+const periodo5AliqFaixa1 = 0.14
+const periodo5ContriMaxFaixa1 = 9999999
+
+function Resultado_final(remuneracao_calculada) {
+    resultado.textContent = remuneracao_calculada.toLocaleString('pt-BR', {style: 'currency', currency: 'BRL'});
+    btnLimpar.disabled = false;
+    btnLimpar.classList.add('ativo');
+}
+
+
+function calculo1Base(valor, aliquota) {
+    let remuneracao = valor / aliquota
+    Resultado_final(remuneracao)
+}
+
+function calculo2Bases(valor, AliqFaixa1, ContriMaxFaixa1, AliqFaixa2, ContriMaxFaixa2) {
+    if (valor <= ContriMaxFaixa1) {
+        remuneracao = valor / AliqFaixa1
+    } else {
+        remuneracao = valor / AliqFaixa2
+    }
+    Resultado_final(remuneracao)
+}
+
+function calculo3Bases(valor, AliqFaixa1, ContriMaxFaixa1, AliqFaixa2, ContriMaxFaixa2, AliqFaixa3, ContriMaxFaixa3) {
+    let contribuicaoFaixa1 = 0
+    let contribuicaoFaixa2 = 0
+    let contribuicaoFaixa3 = 0
+    let remuneracao = 0
+    let valor_original = valor
+
+    if (valor > ContriMaxFaixa1) {
+        contribuicaoFaixa1 = ContriMaxFaixa1 / AliqFaixa1
+        valor = valor - ContriMaxFaixa1
+        remuneracao = remuneracao + contribuicaoFaixa1
+    } else {
+        contribuicaoFaixa1 = valor / AliqFaixa1
+        remuneracao = remuneracao + contribuicaoFaixa1
+        Resultado_final(remuneracao)
+        return
+    }
+
+    if (valor > ContriMaxFaixa2) {
+        contribuicaoFaixa2 = ContriMaxFaixa2 / AliqFaixa2
+        valor = valor - ContriMaxFaixa2
+        remuneracao = remuneracao + contribuicaoFaixa2
+    } else {
+        contribuicaoFaixa2 = valor / AliqFaixa2
+        remuneracao = remuneracao + contribuicaoFaixa2
+        Resultado_final(remuneracao)
+        return
+    }
+
+    if (valor_original > (ContriMaxFaixa1 + ContriMaxFaixa2)) {
+        contribuicaoFaixa3 = valor / AliqFaixa3
+        remuneracao = remuneracao + contribuicaoFaixa3
+    }
+    Resultado_final(remuneracao)
+
+}
+
+
+
+// Função Calcular
+function calcular() {
+    const valorNumerico = parseFloat(valorContribuicao.dataset.value);
+
+    if (!mesDigitado.value || !anoDigitado.value || valorNumerico <= 0) {
+        resultado.textContent = "Preencha todos os campos corretamente.";
+        return;
+    }
+    
+    const dataSelecionada = new Date(
+        parseInt(anoDigitado.value),
+        parseInt(mesDigitado.value) - 1,
+        1
+    );
+
+    // Calculo com apenas 1 base (periodos 1, 4 e 5)
+    if (
+    (dataSelecionada >= periodo1Inicio && dataSelecionada <= periodo1Fim) || 
+    (dataSelecionada >= periodo4Inicio && dataSelecionada <= periodo4Fim) || 
+    (dataSelecionada >= periodo5Inicio && dataSelecionada <= periodo5Fim)) {
+        calculo1Base(valorNumerico, periodo1AliqFaixa1);
+    } 
+    
+    // Calculo com 2 bases (periodo 3)
+    else if (dataSelecionada >= periodo3Inicio && dataSelecionada <= periodo3Fim) {
+        calculo2Bases(valorNumerico, periodo3AliqFaixa1, periodo3ContriMaxFaixa1, periodo3AliqFaixa2, periodo3ContriMaxFaixa2);
+    } 
+    
+    // Calculo com 3 bases (periodo 2)
+    else if (dataSelecionada >= periodo2Inicio && dataSelecionada <= periodo2Fim) {
+        calculo3Bases(valorNumerico, periodo2AliqFaixa1, periodo2ContriMaxFaixa1, periodo2AliqFaixa2, periodo2ContriMaxFaixa2, periodo2AliqFaixa3, periodo2ContriMaxFaixa3);
+    } 
+    
+    else {
+        Resultado_final("Periodo invalido");
+    } 
+
+
+}
+
+// Função Limpar
+function limpar() {
+    mesDigitado.value = "";
+    anoDigitado.value = new Date().getFullYear();
+    valorContribuicao.value = "";
+    valorContribuicao.dataset.value = "0";
+    resultado.textContent = "—";
+    btnLimpar.disabled = true;
+    btnLimpar.classList.remove('ativo');
+}
+
+// Máscara de moeda no input
+valorContribuicao.addEventListener('input', (e) => {
+    let valor = e.target.value.replace(/\D/g, '');
+
+    if (valor === "") {
+        e.target.value = "";
+        e.target.dataset.value = "0";
+        resultado.textContent = "—";
+        return;
+    }
+
+    let numero = Number(valor) / 100;
+    e.target.dataset.value = numero;
+    e.target.value = numero.toLocaleString('pt-BR', {
+        style: 'currency',
+        currency: 'BRL'
+    });
+});
+
+</script>
+</body>
+</html>
